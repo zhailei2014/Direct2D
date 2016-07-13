@@ -1,5 +1,6 @@
 #ifndef _MS_EDIT
 #define _MS_EDIT
+#include "Control.h"
 
 //文本 光标 X、Y偏移位置
 #define TEXT_OFFSET_X 5
@@ -10,7 +11,7 @@
 #define TEXT_SIZE 12
 
 
-class CMsEdit
+class CMsEdit:public CControl
 {
 public:
 	CMsEdit();
@@ -71,6 +72,7 @@ public:
 	void SetClrText(COLORREF cl){ clrText = cl; }
 public:
 	//鼠标键盘事件
+	virtual void OnMsg(UINT message, WPARAM wParam, LPARAM lParam);
 	//鼠标左键按下
 	void OnLBDown( POINT pt);
 	//鼠标抬起

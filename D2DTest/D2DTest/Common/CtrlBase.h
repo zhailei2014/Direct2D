@@ -1,8 +1,15 @@
 #pragma once
-class CControl
+#include "Control.h"
+#include <list>
+
+
+class CCtrlBase
 {
+private:
+	static std::list<CControl*> m_CtrlList;
 public:
-	CControl();
-	~CControl();
+	static void AddContrl(CControl* pCtrl);
+	static void OnMsg(UINT message, WPARAM wParam, LPARAM lParam);
+	static void ReleaseRes();
 };
 

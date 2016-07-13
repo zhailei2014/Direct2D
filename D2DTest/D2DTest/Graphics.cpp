@@ -1,4 +1,6 @@
 #include "Graphics.h"
+#include "Common\CtrlBase.h"
+
 #include "Common\ChatEditBox.h"
 #include "Common\MsEdit.h"
 
@@ -52,9 +54,9 @@ HRESULT CGraphics::Initialize()
 		// 当取值为LWA_ALPHA时，crKey参数无效，bAlpha参数有效； 
 		//当取值为LWA_COLORKEY时，bAlpha参数有效，而窗体中的所有颜色为crKey的地方将变为透明
 		//设置窗体扩展样式
-		SetWindowLong(m_hWnd, GWL_EXSTYLE, WS_EX_LAYERED);
-		//设置窗口透明度  
-		SetLayeredWindowAttributes(m_hWnd, 0, 255, LWA_ALPHA);
+		//SetWindowLong(m_hWnd, GWL_EXSTYLE, WS_EX_LAYERED);
+		////设置窗口透明度  
+		//SetLayeredWindowAttributes(m_hWnd, 0, 255, LWA_ALPHA);
 
 		g_MainWnd = m_hWnd;
 
@@ -64,11 +66,16 @@ HRESULT CGraphics::Initialize()
 		if (SUCCEEDED(hr))
 			hr = CreateDeviceResource();
 
-		RECT rt;
-		GetWindowRect(m_hWnd, &rt);
-		g_edtMsg.Create(m_hInstance, g_MainWnd, rt.left + 100, rt.top + 100, 300, 20);
+		//RECT rt;
+		//GetWindowRect(m_hWnd, &rt);
+		//g_edtMsg.Create(m_hInstance, g_MainWnd, rt.left + 100, rt.top + 100, 300, 20);
 
 		//m_edt.CreateEdit("EDIT", m_hInstance, g_MainWnd, rt.left + 100, rt.top + 100, 300, 20, SW_SHOW);
+
+
+		//CCtrlBase::AddContrl(new CMsEdit());
+
+
 
 		if (SUCCEEDED(hr))
 		{
@@ -165,6 +172,7 @@ LRESULT CALLBACK CGraphics::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
 			//	SetTextColor((HDC)wParam, RGB(200, 132, 10));//文字颜色
 			//	SetBkColor((HDC)wParam, GetSysColor(COLOR_3DDKSHADOW));//文字的背后颜色
 			//	break;
+			
 			}
 		}
 		if (!wasHandled)

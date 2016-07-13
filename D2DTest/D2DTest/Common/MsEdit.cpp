@@ -69,12 +69,58 @@ void CMsEdit::SetFocus(bool bfocus)
 
 
 
-
+void CMsEdit::OnMsg(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	case WM_LBUTTONDOWN:
+	case WM_MOUSEMOVE:
+	case WM_LBUTTONUP:
+	{
+		POINT pt;
+		pt.x = LOWORD(lParam);  // horizontal position of cursor 
+		pt.y = HIWORD(lParam);  // vertical position of cursor 
+		OnLBDown(pt);
+	}
+	break;
+	case WM_LBUTTONDBLCLK:
+	{
+		POINT pt;
+		pt.x = LOWORD(lParam);  // horizontal position of cursor 
+		pt.y = HIWORD(lParam);  // vertical position of cursor 
+		RECT rt;
+		rt.left = nX;
+		rt.top = nY;
+		rt.right = nRight;
+		rt.bottom = nBottom;
+		if (PtInRect(&rt, pt))
+			OnLBDown(pt);
+	}
+	break;
+	case WM_KEYDOWN:
+	case WM_CHAR:
+	{
+		if (bFocus)
+			OnKeyMsg(message, wParam, lParam);
+	}
+	break;
+	default:
+		break;
+	}
+}
 
 //鼠标左键按下
 void CMsEdit::OnLBDown(POINT pt)
 {
-
+	RECT rt;
+	rt.left = nX;
+	rt.top = nY;
+	rt.right = nRight;
+	rt.bottom = nBottom;
+	if (PtInRect(&rt, pt))
+	{
+		bFocus = true;
+	}
 }
 //鼠标抬起
 void CMsEdit::OnLBUp(POINT pt)
