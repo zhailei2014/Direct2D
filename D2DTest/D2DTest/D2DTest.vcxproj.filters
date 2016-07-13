@@ -36,6 +36,12 @@
     <ClInclude Include="Common\MsEdit.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="Common\Control.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\CtrlBase.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Graphics.cpp">
@@ -51,6 +57,12 @@
       <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="Common\MsEdit.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Control.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\CtrlBase.cpp">
       <Filter>Common</Filter>
     </ClCompile>
   </ItemGroup>
