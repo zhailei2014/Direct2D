@@ -86,6 +86,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Common\ChatEditBox.h" />
+    <ClInclude Include="Common\Control.h" />
+    <ClInclude Include="Common\CtrlBase.h" />
     <ClInclude Include="Common\MsEdit.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="HTimer.h" />
@@ -94,6 +96,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\ChatEditBox.cpp" />
+    <ClCompile Include="Common\Control.cpp" />
+    <ClCompile Include="Common\CtrlBase.cpp" />
     <ClCompile Include="Common\MsEdit.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="main.cpp" />
