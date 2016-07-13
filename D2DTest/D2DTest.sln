@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "D2DTest", "D2DTest\D2DTest.vcxproj", "{5D7D057E-641D-4BF6-95D0-040FFBE1F45D}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 2
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://miss5525.visualstudio.com/defaultcollection
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = D2DTest\\D2DTest.vcxproj
+		SccProjectName1 = D2DTest
+		SccLocalPath1 = D2DTest
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5D7D057E-641D-4BF6-95D0-040FFBE1F45D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5D7D057E-641D-4BF6-95D0-040FFBE1F45D}.Debug|Win32.Build.0 = Debug|Win32
+		{5D7D057E-641D-4BF6-95D0-040FFBE1F45D}.Release|Win32.ActiveCfg = Release|Win32
+		{5D7D057E-641D-4BF6-95D0-040FFBE1F45D}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
