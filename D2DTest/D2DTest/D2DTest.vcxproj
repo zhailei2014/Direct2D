@@ -96,7 +96,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\ChatEditBox.cpp" />
-    <ClCompile Include="Common\Control.cpp" />
     <ClCompile Include="Common\CtrlBase.cpp" />
     <ClCompile Include="Common\MsEdit.cpp" />
     <ClCompile Include="Graphics.cpp" />

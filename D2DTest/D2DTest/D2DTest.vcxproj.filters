@@ -59,9 +59,6 @@
     <ClCompile Include="Common\MsEdit.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-    <ClCompile Include="Common\Control.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
     <ClCompile Include="Common\CtrlBase.cpp">
       <Filter>Common</Filter>
     </ClCompile>
