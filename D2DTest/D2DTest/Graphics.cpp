@@ -10,7 +10,8 @@ CChatEdit g_edtMsg;
 CMsEdit m_edt;
 
 CGraphics::CGraphics() :m_BRunning(FALSE), m_hInstance(NULL),
-m_hWnd(NULL), m_pFactory(NULL), m_pRenderTarget(NULL), m_pWriteFactory(NULL)
+m_hWnd(NULL), m_pFactory(NULL), m_pRenderTarget(NULL), m_pWriteFactory(NULL),
+pWriteparam(NULL)
 {
 
 }
@@ -21,6 +22,7 @@ CGraphics::~CGraphics()
 	RELEASE(m_pFactory);
 	RELEASE(m_pRenderTarget);
 	RELEASE(m_pWriteFactory);
+	RELEASE(pWriteparam);
 	m_hWnd = NULL;
 	m_hInstance = NULL;
 }
@@ -191,6 +193,9 @@ HRESULT CGraphics::CreateIndependentDeviceResource()
 
 	if (SUCCEEDED(hr))
 		hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&m_pWriteFactory));
+	HMONITOR hm = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONULL);
+	if (SUCCEEDED(hr))
+		hr = m_pWriteFactory->CreateMonitorRenderingParams(hm, &pWriteparam);
 
 	return hr;
 }
@@ -234,7 +239,15 @@ HRESULT CGraphics::OnRender()
 		m_pRenderTarget->BeginDraw();
 		m_pRenderTarget->Clear(D2D1::ColorF(170.f / 255.f, 210.f / 255.f, 235.f / 255.f));
 		//在此处添加画面渲染代码...
+		WCHAR *_String = L"123哈";
+		m_pRenderTarget->DrawText(_String, wcslen(_String), GetTextFormat(TEXTSTYLE::TEXT), D2D1::RectF(100, 100, 300, 130), m_pSolidBrush);
+		
 
+		D2D1_SIZE_F size = m_pRenderTarget->GetSize();
+
+		//m_pRenderTarget->GetTextRenderingParams(&pWriteparam);
+
+		//DWRITE_PIXEL_GEOMETRY writePG = pWriteparam->GetPixelGeometry();
 		//
 		m_pRenderTarget->EndDraw();
 		if (hr == D2DERR_RECREATE_TARGET)

@@ -47,7 +47,7 @@ public:
 	ID2D1HwndRenderTarget *GetRenderTarget(){ return m_pRenderTarget; }
 	IDWriteFactory * GetWriteFactory(){ return m_pWriteFactory; }
 	ID2D1SolidColorBrush *GetSolidBrush() { return m_pSolidBrush; }
-	IDWriteTextFormat* GetTextFormat(TEXTSTYLE ts){ m_TextFormat.GetTextFormat(ts); }
+	IDWriteTextFormat* GetTextFormat(TEXTSTYLE ts){ return m_TextFormat.GetTextFormat(ts); }
 
 	HRESULT CreateIndependentDeviceResource();
 	HRESULT CreateDeviceResource();
@@ -55,6 +55,9 @@ public:
 
 	HRESULT OnRender();
 	void UpDate();
+
+public:
+	IDWriteRenderingParams *pWriteparam;
 };
 
 #endif

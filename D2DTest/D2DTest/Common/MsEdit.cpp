@@ -64,6 +64,7 @@ void CMsEdit::SetCaretPos()
 	
 }
 
+
 //…Ë÷√Ωπµ„
 void CMsEdit::SetFocus(bool bfocus)
 {
