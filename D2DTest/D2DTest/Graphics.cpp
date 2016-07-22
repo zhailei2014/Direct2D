@@ -4,25 +4,38 @@
 #include "Common\ChatEditBox.h"
 #include "Common\MsEdit.h"
 
+using namespace Microsoft::WRL;
+
 UINT g_WndWidth, g_WndHight;
 HWND g_MainWnd;
 CChatEdit g_edtMsg;
 CMsEdit m_edt;
 
-CGraphics::CGraphics() :m_BRunning(FALSE), m_hInstance(NULL),
-m_hWnd(NULL), m_pFactory(NULL), m_pRenderTarget(NULL), m_pWriteFactory(NULL),
-pWriteparam(NULL)
-{
+IDWriteTextLayout *pTextlayout;
+//WCHAR m_str[MAX_PATH];
 
+CGraphics::CGraphics() :m_BRunning(FALSE), m_hInstance(NULL), m_pFactory1(NULL), m_pDevice(NULL), m_pDeviceContext(NULL),
+m_hWnd(NULL), m_pFactory(NULL), m_pRenderTarget(NULL), m_pWriteFactory(NULL), m_pSwapChain(NULL)
+{
+	m_parameters.DirtyRectsCount = 0;
+	m_parameters.pDirtyRects = nullptr;
+	m_parameters.pScrollRect = nullptr;
+	m_parameters.pScrollOffset = nullptr;
+	//ZeroMemory(m_str, MAX_PATH);
+	MultiByteToWideChar(CP_ACP, 0, "123哈哈哈", -1, m_str, MAX_PATH);
 }
 
 CGraphics::~CGraphics()
 {
 	m_BRunning = FALSE;
 	RELEASE(m_pFactory);
+	RELEASE(m_pFactory1);
+	RELEASE(m_pDevice);
+	RELEASE(m_pSwapChain);
+	RELEASE(m_pDeviceContext);
 	RELEASE(m_pRenderTarget);
 	RELEASE(m_pWriteFactory);
-	RELEASE(pWriteparam);
+	RELEASE(m_pD2DTargetBimtap);
 	m_hWnd = NULL;
 	m_hInstance = NULL;
 }
@@ -74,9 +87,7 @@ HRESULT CGraphics::Initialize()
 
 		//m_edt.CreateEdit("EDIT", m_hInstance, g_MainWnd, rt.left + 100, rt.top + 100, 300, 20, SW_SHOW);
 
-
 		//CCtrlBase::AddContrl(new CMsEdit());
-
 
 
 		if (SUCCEEDED(hr))
@@ -174,8 +185,13 @@ LRESULT CALLBACK CGraphics::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
 			//	SetTextColor((HDC)wParam, RGB(200, 132, 10));//文字颜色
 			//	SetBkColor((HDC)wParam, GetSysColor(COLOR_3DDKSHADOW));//文字的背后颜色
 			//	break;
-			
+			case WM_MOUSEMOVE:
+			{
+				//pTextlayout->HitTestTextRange()
 			}
+			break;
+			}
+
 		}
 		if (!wasHandled)
 		{
@@ -192,10 +208,12 @@ HRESULT CGraphics::CreateIndependentDeviceResource()
 	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pFactory);
 
 	if (SUCCEEDED(hr))
-		hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&m_pWriteFactory));
-	HMONITOR hm = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONULL);
+		hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pFactory1);
+
 	if (SUCCEEDED(hr))
-		hr = m_pWriteFactory->CreateMonitorRenderingParams(hm, &pWriteparam);
+		hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&m_pWriteFactory));
+	if (SUCCEEDED(hr))
+		hr = CoCreateInstance(CLSID_WICImagingFactory2,nullptr,CLSCTX_INPROC_SERVER,IID_IWICImagingFactory2,reinterpret_cast<void **>(&m_pWICFactory));
 
 	return hr;
 }
@@ -214,10 +232,147 @@ HRESULT CGraphics::CreateDeviceResource()
 			D2D1::HwndRenderTargetProperties(m_hWnd, uSize, D2D1_PRESENT_OPTIONS_IMMEDIATELY), &m_pRenderTarget);
 
 		if (SUCCEEDED(hr))
-			hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &m_pSolidBrush);
+			hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), &m_pSolidBrush);
 
 		if (SUCCEEDED(hr))
 			hr = m_TextFormat.Initialize(this);
+
+
+		if (SUCCEEDED(hr))
+			hr = m_pWriteFactory->CreateTextLayout(m_str, MAX_PATH, GetTextFormat(TEXTSTYLE::TEXT), 100, 30, &pTextlayout);
+
+
+
+
+
+		UINT creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+
+		D3D_FEATURE_LEVEL featureLevels[] =
+		{
+			D3D_FEATURE_LEVEL_11_1,
+			D3D_FEATURE_LEVEL_11_0,
+			D3D_FEATURE_LEVEL_10_1,
+			D3D_FEATURE_LEVEL_10_0,
+			D3D_FEATURE_LEVEL_9_3,
+			D3D_FEATURE_LEVEL_9_2,
+			D3D_FEATURE_LEVEL_9_1
+		};
+		D3D_FEATURE_LEVEL m_featureLevel;
+
+		ID3D11Device *pD3Ddevice = nullptr;
+
+		ComPtr<ID3D11DeviceContext> context;
+
+		if (SUCCEEDED(hr))
+			hr = D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE, 0, creationFlags, featureLevels, ARRAYSIZE(featureLevels),
+			D3D11_SDK_VERSION, &pD3Ddevice, &m_featureLevel, &context);
+
+		ComPtr<IDXGIDevice1> dxgiDevice;
+		if (SUCCEEDED(hr))
+			hr = pD3Ddevice->QueryInterface(__uuidof(IDXGIDevice1), &dxgiDevice);
+
+		if (SUCCEEDED(hr))
+			hr = m_pFactory1->CreateDevice(dxgiDevice.Get(), &m_pDevice);
+
+		if (SUCCEEDED(hr))
+			hr = m_pDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &m_pDeviceContext);
+
+
+		// 获取窗口大小
+		RECT rect;
+		::GetClientRect(m_hWnd, &rect);
+		rect.right -= rect.left;
+		rect.bottom -= rect.top;
+
+
+		DXGI_SWAP_CHAIN_FULLSCREEN_DESC fullscreenDesc;
+		// 设置刷新率60FPS
+		fullscreenDesc.RefreshRate.Numerator = 60;
+		fullscreenDesc.RefreshRate.Denominator = 1;
+		// 扫描方案
+		fullscreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		// 缩放方案
+		fullscreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		// 全屏显示
+		fullscreenDesc.Windowed = true;
+
+		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = { 0 };
+		swapChainDesc.Width = rect.right;                           // use automatic sizing
+		swapChainDesc.Height = rect.bottom;
+		swapChainDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM; // this is the most common swapchain format
+		swapChainDesc.Stereo = false;
+		swapChainDesc.SampleDesc.Count = 1;                // don't use multi-sampling
+		swapChainDesc.SampleDesc.Quality = 0;
+		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		swapChainDesc.BufferCount = 2;                     // use double buffering to enable flip
+		swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+		swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD; // all apps must use this SwapEffect
+		swapChainDesc.Flags = 0;
+
+		ComPtr<IDXGIAdapter> dxgiAdapter;
+
+		if (SUCCEEDED(hr))
+			hr = dxgiDevice->GetAdapter(&dxgiAdapter);
+
+		ComPtr<IDXGIFactory2> dxgiFactory;
+		if (SUCCEEDED(hr))
+			hr = dxgiAdapter->GetParent(IID_PPV_ARGS(&dxgiFactory));
+
+		if (SUCCEEDED(hr))
+			hr = dxgiFactory->CreateSwapChainForHwnd(pD3Ddevice, m_hWnd, &swapChainDesc, &fullscreenDesc, nullptr, &m_pSwapChain);
+
+		if (SUCCEEDED(hr))
+			hr = dxgiDevice->SetMaximumFrameLatency(1);
+
+
+		ComPtr<ID3D11Texture2D> backBuffer;
+
+		if (SUCCEEDED(hr))
+			hr = m_pSwapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer));
+
+		if (SUCCEEDED(hr)) {
+			D2D1_BITMAP_PROPERTIES1 bitmapProperties = D2D1::BitmapProperties1(
+				D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
+				D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED),
+				FIXED_DPI,
+				FIXED_DPI
+				);
+
+			ComPtr<IDXGISurface> dxgiBackBuffer;
+
+			hr = m_pSwapChain->GetBuffer(0, IID_PPV_ARGS(&dxgiBackBuffer));
+			if (SUCCEEDED(hr))
+				hr = m_pDeviceContext->CreateBitmapFromDxgiSurface(
+				dxgiBackBuffer.Get(),
+				&bitmapProperties,
+				&m_pD2DTargetBimtap
+				);
+			if (SUCCEEDED(hr))
+			{
+				m_pDeviceContext->SetTarget(m_pD2DTargetBimtap);
+				m_pDeviceContext->SetUnitMode(D2D1_UNIT_MODE_PIXELS);
+			}
+		}
+
+
+		if (SUCCEEDED(hr))
+			hr = LoadBitmapFromFile(m_pDeviceContext, m_pWICFactory, L"1.jpg", 0, 0, &m_pBitmapLoaded);
+
+		
+		if (SUCCEEDED(hr))
+			hr = m_pDeviceContext->CreateEffect(/*CLSID_D2D1DirectionalBlur*/CLSID_D2D1ColorMatrix, &m_pEffectTest);
+		// 设置输入
+
+		D2D1_MATRIX_5X4_F matrix = D2D1::Matrix5x4F(1, 0, 0, 0.05,  0, 1, 0, 0.05,  0, 0, 1, 0.05,  0, 0, 0, 1, 0, 0, 0, 0);
+		if (SUCCEEDED(hr))
+		{
+			m_pEffectTest->SetInput(0, m_pBitmapLoaded);
+			hr = m_pEffectTest->SetValue(D2D1_COLORMATRIX_PROP_COLOR_MATRIX, matrix);
+		}
+			
+
+		RELEASE(pD3Ddevice);
 	}
 	return hr;
 }
@@ -226,6 +381,7 @@ void CGraphics::DiscardDeviceResource()
 {
 	RELEASE(m_pRenderTarget);
 	RELEASE(m_pSolidBrush);
+	RELEASE(m_pDeviceContext);
 	m_TextFormat.Release();
 }
 
@@ -236,26 +392,25 @@ HRESULT CGraphics::OnRender()
 
 	if (SUCCEEDED(hr))
 	{
-		m_pRenderTarget->BeginDraw();
-		m_pRenderTarget->Clear(D2D1::ColorF(170.f / 255.f, 210.f / 255.f, 235.f / 255.f));
-		//在此处添加画面渲染代码...
-		WCHAR *_String = L"123哈";
-		m_pRenderTarget->DrawText(_String, wcslen(_String), GetTextFormat(TEXTSTYLE::TEXT), D2D1::RectF(100, 100, 300, 130), m_pSolidBrush);
+		m_pDeviceContext->BeginDraw();
+		m_pDeviceContext->Clear(D2D1::ColorF(D2D1::ColorF::CornflowerBlue));
+
+		m_pDeviceContext->DrawImage(m_pEffectTest/*.Get()*/, D2D1_POINT_2F());
+
+		m_pDeviceContext->EndDraw();
 		
+		//m_pRenderTarget->BeginDraw();
+		//m_pRenderTarget->Clear(D2D1::ColorF(170.f / 255.f, 210.f / 255.f, 235.f / 255.f));
+		////在此处添加渲染代码...
 
-		D2D1_SIZE_F size = m_pRenderTarget->GetSize();
-
-		//m_pRenderTarget->GetTextRenderingParams(&pWriteparam);
-
-		//DWRITE_PIXEL_GEOMETRY writePG = pWriteparam->GetPixelGeometry();
-		//
-		m_pRenderTarget->EndDraw();
+		//m_pRenderTarget->EndDraw();
 		if (hr == D2DERR_RECREATE_TARGET)
 		{
 			hr = S_OK;
 			DiscardDeviceResource();
 		}
-		InvalidateRect(m_hWnd, NULL, FALSE);
+		hr = m_pSwapChain->Present1(1, 0, &m_parameters);
+		//InvalidateRect(m_hWnd, NULL, FALSE);
 	}
 	return hr;
 }
@@ -265,3 +420,103 @@ void CGraphics::UpDate()
 
 }
 
+
+
+// 从文件读取位图
+HRESULT CGraphics::LoadBitmapFromFile(ID2D1DeviceContext *pRenderTarget,IWICImagingFactory2 *pIWICFactory,PCWSTR uri,UINT destinationWidth,UINT destinationHeight,ID2D1Bitmap1 **ppBitmap)
+{
+	IWICBitmapDecoder *pDecoder = nullptr;
+	IWICBitmapFrameDecode *pSource = nullptr;
+	IWICStream *pStream = nullptr;
+	IWICFormatConverter *pConverter = nullptr;
+	IWICBitmapScaler *pScaler = nullptr;
+
+	HRESULT hr = pIWICFactory->CreateDecoderFromFilename(
+		uri,
+		nullptr,
+		GENERIC_READ,
+		WICDecodeMetadataCacheOnLoad,
+		&pDecoder
+		);
+
+	if (SUCCEEDED(hr))
+	{
+		hr = pDecoder->GetFrame(0, &pSource);
+	}
+	if (SUCCEEDED(hr))
+	{
+		hr = pIWICFactory->CreateFormatConverter(&pConverter);
+	}
+
+
+	if (SUCCEEDED(hr))
+	{
+		if (destinationWidth != 0 || destinationHeight != 0)
+		{
+			UINT originalWidth, originalHeight;
+			hr = pSource->GetSize(&originalWidth, &originalHeight);
+			if (SUCCEEDED(hr))
+			{
+				if (destinationWidth == 0)
+				{
+					FLOAT scalar = static_cast<FLOAT>(destinationHeight) / static_cast<FLOAT>(originalHeight);
+					destinationWidth = static_cast<UINT>(scalar * static_cast<FLOAT>(originalWidth));
+				}
+				else if (destinationHeight == 0)
+				{
+					FLOAT scalar = static_cast<FLOAT>(destinationWidth) / static_cast<FLOAT>(originalWidth);
+					destinationHeight = static_cast<UINT>(scalar * static_cast<FLOAT>(originalHeight));
+				}
+
+				hr = pIWICFactory->CreateBitmapScaler(&pScaler);
+				if (SUCCEEDED(hr))
+				{
+					hr = pScaler->Initialize(
+						pSource,
+						destinationWidth,
+						destinationHeight,
+						WICBitmapInterpolationModeCubic
+						);
+				}
+				if (SUCCEEDED(hr))
+				{
+					hr = pConverter->Initialize(
+						pScaler,
+						GUID_WICPixelFormat32bppPBGRA,
+						WICBitmapDitherTypeNone,
+						nullptr,
+						0.f,
+						WICBitmapPaletteTypeMedianCut
+						);
+				}
+			}
+		}
+		else
+		{
+			hr = pConverter->Initialize(
+				pSource,
+				GUID_WICPixelFormat32bppPBGRA,
+				WICBitmapDitherTypeNone,
+				nullptr,
+				0.f,
+				WICBitmapPaletteTypeMedianCut
+				);
+		}
+	}
+	if (SUCCEEDED(hr))
+	{
+		hr = pRenderTarget->CreateBitmapFromWicBitmap(
+			pConverter,
+			nullptr,
+			ppBitmap
+			);
+	}
+
+	RELEASE(pDecoder);
+	RELEASE(pSource);
+	RELEASE(pStream);
+	RELEASE(pConverter);
+	RELEASE(pScaler);
+
+	return hr;
+}

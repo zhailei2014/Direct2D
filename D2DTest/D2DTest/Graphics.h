@@ -2,8 +2,14 @@
 #ifndef __GRAPHIC
 #define __GRAPHIC
 
-#include <D2D1.h>
+#include <D2D1_1.h>
 #include <DxErr.h>
+#include <dwrite_2.h>
+#include <d3d11_1.h>
+#include <WRL\client.h>
+#include <wincodec.h>
+#include <d2d1effects.h>
+
 #include <xnamath.h>
 #include "IShare.h"
 #include "TextFormat.h"
@@ -13,7 +19,7 @@ EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 #define HINST_THISCOMPONENT ((HINSTANCE)&__ImageBase)
 #endif
 
-
+#define FIXED_DPI (96.f)
 
 
 class CGraphics
@@ -33,6 +39,20 @@ private:
 	CTextFormat m_TextFormat;
 	BOOL m_BRunning;
 
+	ID2D1Factory1 *m_pFactory1;
+	ID2D1Device *m_pDevice;
+	ID2D1DeviceContext * m_pDeviceContext;
+	IDXGISwapChain1 *m_pSwapChain;
+	// 载入的图片
+	ID2D1Bitmap1* m_pBitmapLoaded = nullptr;
+	ID2D1Bitmap1* m_pD2DTargetBimtap=nullptr;
+	// WIC 工厂
+	IWICImagingFactory2* m_pWICFactory = nullptr;
+	// 测试特效
+	ID2D1Effect* m_pEffectTest = nullptr;
+	
+	// 手动交换链
+	DXGI_PRESENT_PARAMETERS m_parameters;
 public:
 	BOOL IsRunning(){ return m_BRunning; }
 	void OnDestroy(){ m_BRunning = FALSE; }
@@ -56,8 +76,12 @@ public:
 	HRESULT OnRender();
 	void UpDate();
 
+
+	HRESULT LoadBitmapFromFile(ID2D1DeviceContext *pRenderTarget,IWICImagingFactory2 *pIWICFactory,PCWSTR uri,UINT destinationWidth,UINT destinationHeight,ID2D1Bitmap1 **ppBitmap);
+//测试
 public:
-	IDWriteRenderingParams *pWriteparam;
+	
+	WCHAR m_str[MAX_PATH];
 };
 
 #endif

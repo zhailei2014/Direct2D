@@ -11,20 +11,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{5D7D057E-641D-4BF6-95D0-040FFBE1F45D}</ProjectGuid>
+    <ProjectGuid>{92A4DD58-3E29-419B-B5EC-3E822EDB8335}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>D2DTest</RootNamespace>
-    <SccProjectName>SAK</SccProjectName>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccProvider>SAK</SccProvider>
+    <RootNamespace>D2DBase</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -45,8 +41,6 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(D3DHEAD);</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(D3DLIB);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -63,7 +57,6 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>dxguid.lib;windowscodecs.lib;d3d11.lib;d2d1.lib;dxerr.lib;dwrite.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -85,22 +78,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Common\ChatEditBox.h" />
-    <ClInclude Include="Common\Control.h" />
-    <ClInclude Include="Common\CtrlBase.h" />
-    <ClInclude Include="Common\MsEdit.h" />
-    <ClInclude Include="Graphics.h" />
-    <ClInclude Include="HTimer.h" />
-    <ClInclude Include="IShare.h" />
-    <ClInclude Include="TextFormat.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Common\ChatEditBox.cpp" />
-    <ClCompile Include="Common\CtrlBase.cpp" />
-    <ClCompile Include="Common\MsEdit.cpp" />
-    <ClCompile Include="Graphics.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="TextFormat.cpp" />
+    <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
